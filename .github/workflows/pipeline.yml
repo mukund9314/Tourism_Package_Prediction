@@ -3,7 +3,7 @@ name: Tourism_Project Pipeline
 on:
   push:
     branches:
-      - main   # Trigger pipeline on push to main
+      - main
 
 jobs:
 
@@ -12,10 +12,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Dependencies
-        run: pip install -r Tourism_Project/requirements.txt
+      - name: Install Python dependencies
+        run: pip install huggingface_hub pandas
 
-      - name: Upload Dataset to Hugging Face Hub
+      - name: Upload dataset to HuggingFace
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: python Tourism_Project/model_building/data_register.py
@@ -27,10 +27,10 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Dependencies
-        run: pip install -r Tourism_Project/requirements.txt
+      - name: Install Python dependencies
+        run: pip install huggingface_hub pandas scikit-learn
 
-      - name: Run Data Preparation
+      - name: Run data preparation
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: python Tourism_Project/model_building/prep.py
@@ -42,30 +42,26 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Dependencies
-        run: pip install -r Tourism_Project/requirements.txt
+      - name: Install Python dependencies
+        run: pip install huggingface_hub pandas scikit-learn xgboost mlflow joblib
 
-      - name: Start MLflow Server (Background)
-        run: |
-          nohup mlflow ui --host 0.0.0.0 --port 5000 &
-          sleep 5
-
-      - name: Train Model
+      - name: Train model (local run)
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: python Tourism_Project/model_building/train.py
 
 
   deploy-hosting:
-    needs: [model-training, data-prep, register-dataset]
+    needs: model-training
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
 
-      - name: Install Dependencies
-        run: pip install -r Tourism_Project/requirements.txt
+      - name: Install Python dependencies
+        run: pip install huggingface_hub
 
-      - name: Deploy Frontend (Streamlit App) to Hugging Face Space
+      - name: Upload Streamlit files to HF Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: python Tourism_Project/hosting/hosting.py
+
