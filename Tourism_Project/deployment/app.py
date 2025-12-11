@@ -6,9 +6,11 @@ import joblib
 
 # Load trained model from Hugging Face
 model_path = hf_hub_download(
-    repo_id="mukund9314/Tourism-Package-Prediction",
-    filename="best_tourism_package_prediction_model_v1.joblib"
+    repo_id="mukund9314/Tourism-Package-Model",
+    filename="best_tourism_package_prediction_model_v1.joblib",
+    repo_type="model"
 )
+
 model = joblib.load(model_path)
 
 st.title("Tourism Package Purchase Prediction App")
